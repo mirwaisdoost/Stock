@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Stock.Models.Attributes>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
+<table class="table table-bordered" id="table" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AttributeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Size)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Color)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AttributeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Size)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Color)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.AttributeId" class="btn btn-primary btn-sm p-0 pr-1 pl-1" >Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.AttributeId" class="btn btn-primary btn-sm p-0 pr-1 pl-1">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.AttributeId" class="btn btn-danger btn-sm p-0 pr-1 pl-1"  onclick="return confirm('Are you sure you want to delete the selected record?')">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function () {
+                var table = $('#table').DataTable({
+                    dom: 'Bfrtip',
+                    lengthChange: false,
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'colvis', 'print']
+                });
+
+                table.buttons().container()
+                    .appendTo('#example_wrapper .col-md-6:eq(0)');
+            });
+</script>

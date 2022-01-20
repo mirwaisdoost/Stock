@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Stock.ViewModels.OrderDetailsViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div class="mb-3">
+        <a class="btn btn-sm btn-primary" asp-action="Index" asp-controller="Orders"> <i class="fas fa-arrow-left"></i> Back to Orders</a>
+    </div>
+<table class="table table-bordered table-hover" id="table" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDetailId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderDetailId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnitPrice)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.OrderDetailId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.OrderDetailId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.OrderDetailId"  onclick="return confirm('Are you sure you want to delete the selected record?')">Delete</a> @*when the selected OrderDetails is deleted then there is no id to filter the index page*@            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+                var table = $('#table').DataTable({
+                    dom: 'Bfrtip',
+                    lengthChange: false,
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'colvis', 'print']
+                });
+
+                table.buttons().container()
+                    .appendTo('#example_wrapper .col-md-6:eq(0)');
+            });
+</script>

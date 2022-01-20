@@ -1,0 +1,4 @@
+﻿/*for show autocomplete in modal*/
+.ui-autocomplete {
+    z-index: 1050;
+}

@@ -1,0 +1,321 @@
+﻿@model Stock.Models.Product
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="ProductId" type="hidden" class="form-control" />
+            </div>
+            <div class="form-group">
+                <div class="form-label-group">
+                    <input asp-for="Name" class="form-control" placeholder="Name" id="Name" />
+                    <label for="Name">Product Name</label>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <div class="card">
+                        <div class="card-header text-center p-2"> Product Properies <a href="#" class="btn btn-outline-dark btn-sm float-right p-0 pl-1 pr-1 m-0 " data-toggle="modal" data-target="#ProductDetails"><i class="fas fa-plus-square"></i></a></div>
+                        <div class="card-body p-1 overflow-auto" style="height:150px;">
+                            <div>
+                                <table id="table1" class="table table-hover table-sm">
+                                    <thead class="table-sm text-center">
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Attribute</th>
+                                            <th>Brand</th>
+                                            <th>Description</th>
+                                            <th>Options</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row col col-5">
+                <div class="col col-6">
+                    <input type="button" value="Save" class="btn btn-primary btn-block btn-sm" onclick="Create();" />
+                </div>
+                <div class="col col-6">
+                    <a asp-action="Index" class="btn btn-secondary btn-sm btn-block"><i class="fas fa-table"></i> Back to List</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="ProductDetails" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="card">
+                <div class="card-header">
+                    Product Property
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group ">
+                            <input type="hidden" class="form-control" id="CategoryId" placeholder="Search" />
+                            <div class="form-label-group">
+                                <input type="text" class="form-control" id="Category" placeholder="Search" />
+                                <label for="Category"> Search Category </label>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <input type="hidden" class="form-control" id="AttributeId" />
+                            <div class="form-label-group">
+                                <input type="text" class="form-control" id="Attribute" placeholder="Search" />
+                                <label for="Attribute">Seerch Attribute</label>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <input type="hidden" class="form-control" id="BrandId" autofocus="autofocus" />
+                            <div class="form-label-group">
+                                <input type="text" class="form-control" id="Brand" placeholder="Search" />
+                                <label for="Brand"> Search Brand</label>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="form-label-group">
+                                <input type="text" class="form-control" id="description" placeholder="Description" />
+                                <label for="description"> Description</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col col-6 p-1">
+                        <button class="btn btn-primary btn-sm btn-block" onclick="AddProductProperty() ;"> Add</button>
+                    </div>
+                    <div class="col col-6 p-1">
+                        <button class="btn btn-secondary btn-sm btn-block" data-dismiss="modal"> Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+   
+
+<script>
+
+    CategoryID = [];
+    AttributeID = [];
+    BrandID = [];
+
+    function Create() {
+        for (var i = 0; i < CategoryID.length; i++) {
+            alert(CategoryID[i]);
+        }
+        
+        var description = new Array();
+
+        var table = document.getElementsByTagName("table")[0];
+        for (var i = 1; i < table.rows.length; i++) {
+
+            description.push(table.rows[i].cells[3].innerHTML);
+
+        }
+
+        var ProductName = $("#Name").val();
+
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: '@Url.Action("Create","Products")',
+            data: { CategoryId: CategoryID, AttributeId:AttributeID, BrandId: BrandID, ProductName:ProductName, description:description},
+            dataType: "html",
+            success: function (r) {
+                location.href = '/Products/Index';
+            },
+            error: function (xhr) { alert("Error!"); }
+        });
+
+    }
+
+    function AddProductProperty() {
+        var CategoryId = $('#CategoryId').val();
+        var AttributeId = $('#AttributeId').val();
+        var BrandId = $('#BrandId').val();
+        var Category = $('#Category').val();
+        var Attribute = $('#Attribute').val();
+        var Brand = $('#Brand').val();
+        var description = $('#description').val();
+
+        var table = document.getElementsByTagName("table")[0];
+
+        var Cb = 1; // check for category if duplicated
+        var Ab = 1; //check for attribute if duplicated
+        var Bb = 1; //check for brand if duplicated
+
+        for (var i = 0; i < CategoryID.length; i++) {
+                if (CategoryID[i] == $("#CategoryId").val())
+                    Cb = 0;
+        }
+
+        for (var i = 0; i < AttributeID.length; i++) {
+            if (AttributeID[i] == $("#AttributeId").val())
+                    Ab = 0;
+        }
+
+        for (var i = 0; i < BrandID.length; i++) {
+            if (BrandID[i] == $("#BrandId").val())
+                    Bb = 0;
+        }
+
+        if ($('#CategoryId').val()>0 && $('#AttributeId').val()>0 && $('#BrandId').val()>0) {
+            if (Cb == 1 || Ab == 1 || Bb == 1) {
+                var newRow = table.insertRow(table.rows.length);
+
+                var cell1 = newRow.insertCell(0);
+                var cell2 = newRow.insertCell(1);
+                var cell3 = newRow.insertCell(2);
+                var cell4 = newRow.insertCell(3);
+                var cell5 = newRow.insertCell(4);
+
+                //cell1.innerHTML = CategoryId;
+                //cell2.innerHTML = AttributeId;
+                //cell3.innerHTML = BrandId;
+
+                CategoryID.push(CategoryId);
+                AttributeID.push(AttributeId);
+                BrandID.push(BrandId);
+                cell1.innerHTML = Category;
+                cell2.innerHTML = Attribute;
+                cell3.innerHTML = Brand;
+                cell4.innerHTML = description;
+                cell5.innerHTML = "<input type='button' name='btnRemove' onclick='RemoveProductProperty();' value='Remove' class='btn btn-danger btn-sm p-0 pl-1 pr-1'>";
+
+                CategoryId = $('#CategoryId').val('');
+                AttributeId = $('#AttributeId').val('');
+                BrandId = $('#BrandId').val('');
+                Category = $('#Category').val('');
+                Attribute = $('#Attribute').val('');
+                Brand = $('#Brand').val('');
+                description = $('#description').val('');
+            } else {
+                alert("Duplicated Entry found!");
+            }
+        } else {
+            alert("Please fill the blanks");
+        }
+    }
+
+    function RemoveProductProperty() {
+        var table = document.getElementsByTagName("table")[0], Index;
+        var drugTotal = $("#drugFee").val();
+        for (var i = 1; i < table.rows.length; i++) {
+            table.rows[i].cells[4].onclick = function () {
+                Index = this.parentElement.rowIndex;
+                CategoryID.splice(Index - 1, 1);
+                AttributeID.splice(Index - 1, 1);
+                BrandID.splice(Index - 1, 1);
+                table.deleteRow(Index);
+            };
+        }
+    }
+
+    $("#Category").autocomplete({
+        open: function (event, ui) {
+            $('#CategoryId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteCategorySelect", "Products")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#CategoryId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+    $("#Attribute").autocomplete({
+        open: function (event, ui) {
+            $('#AttributeId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteAttributeSelect", "Products")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#AttributeId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+    $("#Brand").autocomplete({
+        open: function (event, ui) {
+            $('#BrandId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteBrandSelect", "Products")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#BrandId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+</script>

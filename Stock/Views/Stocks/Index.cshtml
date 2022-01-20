@@ -1,0 +1,78 @@
+﻿@model IEnumerable<Stock.ViewModels.StockViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<table class="table table-bordered table-hover" id="table" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StockId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PurchaseId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductBrand)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StockId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PurchaseId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+           
+            <td>
+                <a asp-action="Delete" asp-route-id="@item.StockId" class="btn btn-danger btn-sm p-0 pr-1 pl-1"  onclick="return confirm('Are you sure you want to delete the selected record?')">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function () {
+                var table = $('#table').DataTable({
+                    dom: 'Bfrtip',
+                    lengthChange: false,
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'colvis', 'print']
+                });
+
+                table.buttons().container()
+                    .appendTo('#example_wrapper .col-md-6:eq(0)');
+            });
+</script>

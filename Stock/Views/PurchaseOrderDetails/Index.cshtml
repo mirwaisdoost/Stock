@@ -1,0 +1,137 @@
+﻿@model IEnumerable<Stock.ViewModels.PurchaseOrderDetailsViewModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <p>
+        <a asp-action="Index" asp-controller="PurchaseOrders">Back to Purchase Order</a>
+        <button onclick="AddToStock()" class="btn btn-primary btn-sm float-right">Add to Stock</button>
+    </p>
+    <table class="table table-bordered table-hover" id="table" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Purchase)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PoductBrand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UnitPrice)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PurchaseId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UnitPrice)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.PurchaseOrderDetailId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.PurchaseOrderDetailId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.PurchaseOrderDetailId" onclick="return confirm('Are you sure you want to delete the selected record?')">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0" style="visibility:hidden;">
+        
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.pbId)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>
+
+
+<script>
+
+     function AddToStock() {
+
+        var PurchaseId = new Array();
+        var ProductBrandId = new Array();
+        var Quantity = new Array();
+        var Price = new Array();
+
+        var table = document.getElementsByTagName("table")[0];
+        for (var i = 1; i < table.rows.length; i++) {
+
+            PurchaseId.push(table.rows[i].cells[0].innerHTML);
+            Quantity.push(table.rows[i].cells[2].innerHTML);
+            Price.push(table.rows[i].cells[3].innerHTML);
+
+        }
+
+        var table1 = document.getElementsByTagName("table")[1];
+        for (var i = 0; i < table1.rows.length; i++) {
+
+            ProductBrandId.push(table1.rows[i].cells[0].innerHTML);
+         }
+
+        var date = $("#Date").val();
+        var CustomerId = $("#CustomerId").val();
+        $.ajax({
+            type: "POST",
+            async: true,
+            url: '@Url.Action("Create","PurchaseOrderDetails")',
+            data: {PurchaseId:PurchaseId, ProductBrandId: ProductBrandId, Quantity:Quantity, Price: Price },
+            dataType: "html",
+            success: function (data) {
+                alert(data);
+                location.href = '/PurchaseOrders/Index';
+            },
+            error: function (xhr) { alert("Error!"); }
+        });
+
+    }
+
+    $(document).ready(function () {
+        var table = $('#table').DataTable({
+            dom: 'Bfrtip',
+            lengthChange: false,
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'colvis', 'print']
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+    });
+
+
+</script>

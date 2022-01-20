@@ -1,0 +1,115 @@
+﻿@model Stock.Models.Payment
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+</head>
+<body>
+
+    <h4>Payment</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <input type="hidden" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Transaction Type:</label>
+                    <select class="form-control" id="transaction">
+                        <option value="1">Received</option>
+                        <option value="2">Payment</option>
+                    </select>
+                </div>
+                <label class="control-label mt-1">Account Type:</label>
+                <div class="border rounded p-2">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="Customer" checked="checked" name="searchRadio" value="1" onclick="SwitchAccountType();" />
+                        <label class="custom-control-label" for="Customer">Customer</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="Suplier" name="searchRadio" value="2" onclick="SwitchAccountType();">
+                        <label class="custom-control-label" for="Suplier">Suplier</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CustomerId" class="control-label">Account:</label>
+                    <input type="text" asp-for="CustomerId" class="form-control" id="Account" />
+                    <input asp-for="CustomerId" type="hidden" class="form-control" id="AccountId" />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Amount:</label>
+                    <input asp-for="Credit" class="form-control" id="Amount" type="number" min="0" />
+                    <span asp-validation-for="Credit" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" id="description" placeholder="Description" />
+                </div>
+                <div class="row">
+                    <div class="col col-6">
+                        <input type="button" value="Create" class="btn btn-primary btn-sm btn-block" onclick="Create();" />
+                    </div>
+                    <div class="col col-6">
+                        <a asp-action="Index" class="btn btn-secondary btn-sm btn-block ml-0"><i class="fas fa-table"></i> Back to List</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+    @*<div class="row">
+            <div class="col-md-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="PaymentId" />
+                    <div class="form-group">
+                        <label asp-for="CustomerId" class="control-label"></label>
+                        <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SuplierId" class="control-label"></label>
+                        <select asp-for="SuplierId" class="form-control" asp-items="ViewBag.SuplierId"></select>
+                        <span asp-validation-for="SuplierId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Credit" class="control-label"></label>
+                        <input asp-for="Credit" class="form-control" />
+                        <span asp-validation-for="Credit" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Debit" class="control-label"></label>
+                        <input asp-for="Debit" class="form-control" />
+                        <span asp-validation-for="Debit" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <input asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>*@
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Stock.Models.Orders>
+
+@{
+  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
+<table class="table table-bordered table-hover" id="table" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.OrderId" class="btn btn-primary btn-sm p-0 pr-1 pl-1" >Edit</a> |
+                <a asp-action="Index" asp-controller="OrderDetails" asp-route-id="@item.OrderId" class="btn btn-primary btn-sm p-0 pr-1 pl-1" >Details</a> |
+                @*@*<a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a> there would be more than one product in an order*@
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+                var table = $('#table').DataTable({
+                    dom: 'Bfrtip',
+                    lengthChange: false,
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'colvis', 'print']
+                });
+
+                table.buttons().container()
+                    .appendTo('#example_wrapper .col-md-6:eq(0)');
+            });
+</script>

@@ -1,0 +1,156 @@
+﻿@model Stock.Models.Payment
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+<h4>Payment</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input type="hidden" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Transaction Type:</label>
+                <select class="form-control" id="transaction">
+                    <option value="1">Received</option>
+                    <option value="2">Payment</option>
+                </select>
+            </div>
+            <label class="control-label mt-1">Account Type:</label>
+            <div class="border rounded p-2">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input  type="radio" class="custom-control-input" id="Customer" checked="checked" name="searchRadio" value="1" onclick="SwitchAccountType();"/>
+                    <label class="custom-control-label" for="Customer">Customer</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" id="Suplier" name="searchRadio" value="2" onclick="SwitchAccountType();">
+                    <label class="custom-control-label" for="Suplier">Suplier</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerId" class="control-label">Account:</label>
+                <input type="text" asp-for="CustomerId" class="form-control" id="Account" />
+                <input asp-for="CustomerId" type="hidden" class="form-control" id="AccountId" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Amount:</label>
+                <input asp-for="Credit" class="form-control" id="Amount" type="number" min="0" />
+                <span asp-validation-for="Credit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" id="description" placeholder="Description" />
+            </div>
+            <div class="row">
+                <div class="col col-6">
+                    <input type="button" value="Save" class="btn btn-primary btn-sm btn-block" onclick="Create();" />
+                </div>
+                    <div class="col col-6">
+                    <a asp-action="Index" class="btn btn-secondary btn-sm btn-block ml-0"><i class="fas fa-table"></i> Back to List</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+</body>
+</html>
+
+<script>
+    function Create() {
+
+        if (document.getElementById('Customer').checked)
+                AccountType = $("#Customer").val();
+            else if (document.getElementById('Suplier').checked)
+              AccountType = $("#Suplier").val();
+
+            var transaction = $("#transaction").val();
+            var AccountId = $("#AccountId").val();
+            var Amount = $("#Amount").val();
+            var description = $("#description").val();
+
+        if ($("#AccountId").val() && $("#Amount").val() > 0) {
+            $.ajax({
+                type: "POST",
+                async: true,
+                url: '@Url.Action("Create","payments")',
+                data: { transaction: transaction, AccountId: AccountId, Amount: Amount, description: description, AccountType: AccountType },
+                dataType: "html",
+                success: function (r) {
+                    alert(r);
+                    location.href = '/Payments/Index';
+                },
+                error: function (xhr) { alert("Error!"); }
+            });
+
+            var AccountId = $("#AccountId").val('');
+            var Amount = $("#Amount").val('');
+
+        } else {
+            alert("Please fill the blanks");
+        }
+    }
+
+    // for switching AccountType to Customer ot Suplier
+    var AccountType = 1;
+
+    function SwitchAccountType() {
+        if (document.getElementById('Customer').checked)
+            AccountType = $("#Customer").val();
+        else if (document.getElementById('Suplier').checked)
+            AccountType = $("#Suplier").val();
+    }
+    
+     
+        $("#Account").autocomplete({
+            open: function (event, ui) {
+                $('#AccountId').val('0');
+            },
+
+            source: function (request, response) {
+                if (AccountType == 1) {
+                    $.getJSON(
+                        '@Url.Action("AutoCompleteCustomerAccountSelect", "Payments")',
+                        { term: request.term, AccountType: AccountType },
+                        response
+                    );
+                } else if (AccountType == 2) {
+                     $.getJSON(
+                        '@Url.Action("AutoCompleteSuplierAccountSelect", "Payments")',
+                        { term: request.term, AccountType: AccountType },
+                        response
+                    );
+                }
+            },
+            minLength: 1,
+            autoFocus: true,
+
+            select: function (event, ui) {
+                //set tagids to save
+                $("#AccountId").val(ui.item.id);
+                //Tags for display
+                this.value = ui.item.label;
+
+                return false;
+            },
+            close: function (event, ui) { }
+        });
+    
+
+</script>

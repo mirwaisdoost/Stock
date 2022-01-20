@@ -1,0 +1,442 @@
+﻿@model Stock.Models.PurchaseOrder
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Create</title>
+</head>
+<body>
+
+    <h4>New Purchase Order</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <input type="hidden" id="PurchaseId" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <div class="form-label-group">
+                        <input asp-for="Date" class="form-control" id="Date" placeholder="Date" type="date" />
+                        <label for="Date" class="control-label">Date</label>
+                    </div>
+                        <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" asp-for="SuplierId" id="SuplierId" class="form-control" />
+                    <div class="form-label-group">
+                        <input type="text" asp-for="SuplierId" id="Suplier" class="form-control" placeholder="Search Suplier" />
+                        <label for="Suplier" class="control-label">Search Suplier</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <div class="card">
+                            <div class="card-header text-center p-2"> Items<a href="#" class="btn btn-outline-dark btn-sm float-right p-0 pl-1 pr-1 m-0 " data-toggle="modal" data-target="#Items"><i class="fas fa-plus-square"></i></a></div>
+                            <div class="card-body p-1 overflow-auto" style="height:150px;">
+                                <div>
+                                    <table id="table1" class="table table-hover table-sm">
+                                        <thead class="table-sm text-center">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Options</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <span><input type="button" value="Save" class="btn btn-primary" onclick="Create();"/></span>
+                    <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-table"></i> Back to List</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Items" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="card">
+                    <div class="card-header">
+                        Order Items
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group ">
+                            <input type="hidden" class="form-control" id="ProductId" placeholder="Description" />
+                            <div class="input-group">
+                                <div class="form-label-group">
+                                    <input type="text" class="form-control" id="Product" placeholder="Search for Product" />
+                                    <label for="Product">Search for Product</label>
+                                </div>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary input-group-text" onclick="SearchProduct();">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="card form-group">
+                                <div class="card-body overflow-auto p-0" style="height:150px;">
+                                    <div>
+                                        <table id="table1" class="table table-hover table-sm">
+                                            <thead class="table-sm text-center">
+                                                <tr>
+                                                    <th>Category</th>
+                                                    <th>Attribute</th>
+                                                    <th>Brand</th>
+                                                    <th>Options</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group row ">
+                                <div class="form-label-group col col-6">
+                                    <input type="number" class="form-control" id="Quantity" placeholder="Quantity" min="1" />
+                                    <label for="Quantity" class="text-center">Quantity</label>
+                                </div>
+                                <div class="form-label-group col col-6">
+                                    <input type="number" class="form-control" id="Price" placeholder="Price" min="0" />
+                                    <label for="Price" class="text-center">Price</label>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col col-6 p-1">
+                            <button class="btn btn-primary btn-sm btn-block" onclick="AddItems();"> Add</button>
+                        </div>
+                        <div class="col col-6 p-1">
+                            <button class="btn btn-secondary btn-sm btn-block" data-dismiss="modal"> Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<script>
+
+    var ProductBrandId = 0;  // Please choose a product
+    var ProductBrandName = 0;  //Please choose a product
+
+    ProductBrandIdList = [];
+    ChoseProductBrandId = [];
+
+    function Create() {
+
+        var Quantity = new Array();
+        var Price = new Array();
+
+        var table = document.getElementsByTagName("table")[0];
+        for (var i = 1; i < table.rows.length; i++) {
+
+            Quantity.push(table.rows[i].cells[1].innerHTML);
+            Price.push(table.rows[i].cells[2].innerHTML);
+
+        }
+        if ($("#SuplierId").val() > 0 && $("#Date").val()!='' &&  table.rows.length>1) {
+            var date = $("#Date").val();
+            var SuplierId = $("#SuplierId").val();
+            $.ajax({
+                type: "POST",
+                async: true,
+                url: '@Url.Action("Create","PurchaseOrders")',
+                data: { Pdate: date, SuplierId: SuplierId, ProductBrandId: ChoseProductBrandId, Quantity: Quantity, Price: Price },
+                dataType: "html",
+                success: function (r) {
+                    location.href = '/PurchaseOrders/Index';
+                },
+                error: function (xhr) { alert("Error!"); }
+            });
+        } else {
+            alert("Please fill the blanks")
+        }
+    }
+
+    function SearchProduct() {
+        var ProductId = $('#ProductId').val();
+        $.ajax({
+            type: "GET",
+            async: true,
+            url: '@Url.Action("SearchProduct","PurchaseOrders")',
+            data: {ProductId:ProductId},
+            dataType: "html",
+            success: function (data) {
+                var item = $.parseJSON(data);
+
+                var table = document.getElementsByTagName("table")[1];
+                var rowCount = table.rows.length;
+
+                for (var i = rowCount - 1; i > 0; i--) {
+                    table.deleteRow(i);
+                }
+
+                ProductBrandIdList.splice(0, ProductBrandIdList.length);
+
+                for (var i = 0; i < item.length; i++) {
+
+                    var newRow = table.insertRow(table.rows.length);
+                    var cell1 = newRow.insertCell(0);
+                    var cell2 = newRow.insertCell(1);
+                    var cell3 = newRow.insertCell(2);
+                    var cell4 = newRow.insertCell(3);
+
+                    ProductBrandIdList.push(item[i].productbrandId)
+
+                    cell1.innerHTML = item[i].category;
+                    cell2.innerHTML = item[i].attributes;
+                    cell3.innerHTML = item[i].brands;
+                    cell4.innerHTML = "<input type='button' name='btnRemove' onclick='getProductBrandId();' value='Choose' class='btn btn-primary btn-sm p-0 pl-1 pr-1 mr-1'>";
+
+                }
+            },
+            error: function (xhr) { alert("Error!"); }
+        });
+    }
+
+    var b = 1;
+    var Index = 0;
+    function getProductBrandId() {
+        var table = document.getElementsByTagName("table")[1];
+        for (var i = 1; i < table.rows.length; i++) {
+            table.rows[i].cells[3].onclick = function () {
+                Index = this.parentElement.rowIndex;
+                ProductBrandName = $("#Product").val() + "( " + table.rows[Index].cells[1].innerText + ", " + table.rows[Index].cells[2].innerText + ", " + table.rows[Index].cells[3].innerText + " )";
+
+            };
+        }
+    }
+
+    function AddItems() {
+        var Quantity = $('#Quantity').val();
+        var Price = $('#Price').val();
+
+        var table = document.getElementsByTagName("table")[0];
+
+
+
+
+        if (Product != '' || $('#Quantity').val() != '' || $('#Price').val() != '' || $('#Brand').val() != '' || $('#Attribute').val() != '' || $('#Category').val() != '') {
+            if (Quantity >= 1 && Price >= 1) {
+                    for (var i = 0; i < ChoseProductBrandId.length; i++) {
+                        if (ChoseProductBrandId[i] == ProductBrandIdList[Index - 1]) {
+                            b = 0;
+                            i = ChoseProductBrandId.length;
+                        }
+                        else
+                            b = 1;
+                    }
+
+                    if (b) {
+                        ChoseProductBrandId.push(ProductBrandIdList[Index - 1]);
+                    }
+                if ( Index-1 >= 0) {
+
+                    if (b) {
+                        var newRow = table.insertRow(table.rows.length);
+                        var cell1 = newRow.insertCell(0);
+                        var cell2 = newRow.insertCell(1);
+                        var cell3 = newRow.insertCell(2);
+                        var cell4 = newRow.insertCell(3);
+
+                        cell1.innerHTML = ProductBrandName;
+                        cell2.innerHTML = Quantity;
+                        cell3.innerHTML = Price;
+                        cell4.innerHTML = "<input type='button' name='btnRemove' onclick='RemoveItems();' value='Remove' class='btn btn-danger btn-sm p-0 pl-1 pr-1'>";
+
+                        Quantity = $('#Quantity').val('');
+                        Price = $('#Price').val('');
+                        Index = -1;
+                    } else {
+                    alert("Duplicate product is FOUND!");
+                       
+                    }
+                } else {
+                     alert("Please choose a product!");
+                }
+            } else {
+                
+                alert("Quantity or Price must be greater or equal to 1")
+            }
+        } else {
+            alert("Please fill all BLANKS");
+        }
+    }
+
+    function RemoveItems() {
+        var table = document.getElementsByTagName("table")[0], Index;
+        var drugTotal = $("#drugFee").val();
+        for (var i = 1; i < table.rows.length; i++) {
+            table.rows[i].cells[3].onclick = function () {
+                Index = this.parentElement.rowIndex;
+                ChoseProductBrandId.splice(Index - 1, 1);
+                table.deleteRow(Index);
+            };
+        }
+    }
+
+
+
+    $("#Suplier").autocomplete({
+        open: function (event, ui) {
+            $('#SuplierId').val('0');
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteSuplierSelect", "PurchaseOrders")',
+                { term: request.term},
+                response
+            );
+
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#SuplierId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+    
+    $("#Category").autocomplete({
+        open: function (event, ui) {
+            $('#CategoryId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteCategorySelect", "PurchaseOrders")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#CategoryId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+    $("#Attribute").autocomplete({
+        open: function (event, ui) {
+            $('#AttributeId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteAttributeSelect", "PurchaseOrders")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#AttributeId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+    $("#Brand").autocomplete({
+        open: function (event, ui) {
+            $('#BrandId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteBrandSelect", "PurchaseOrders")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#BrandId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+
+    $("#Product").autocomplete({
+        open: function (event, ui) {
+            $('#ProductId').val('0');
+
+        },
+
+        source: function (request, response) {
+
+            $.getJSON(
+                '@Url.Action("AutoCompleteProductSelect", "PurchaseOrders")',
+                { term: request.term},
+                response
+            );
+        },
+        minLength: 1,
+        autoFocus: true,
+
+        select: function (event, ui) {
+            //set tagids to save
+            $("#ProductId").val(ui.item.id);
+            //Tags for display
+            this.value = ui.item.label;
+
+            return false;
+        },
+        close: function (event, ui) { }
+    });
+
+</script>
